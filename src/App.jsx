@@ -6,6 +6,8 @@ import IslandDetail from './pages/IslandDetail';
 import Contact from './pages/Contact';
 import PlanTrip from './pages/PlanTrip';
 import SearchResults from './pages/SearchResults';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/plan-trip" element={<PlanTrip />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           {/* Future routes for feature pages */}
           <Route path="/island/:id/hotels" element={<ComingSoon feature="Hotels" />} />
           <Route path="/island/:id/restaurants" element={<ComingSoon feature="Restaurants" />} />
