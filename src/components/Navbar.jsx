@@ -1,12 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaEnvelope, FaMapMarkedAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FaHome, FaEnvelope, FaMapMarkedAlt, FaBars, FaTimes, FaSignOutAlt, FaUser } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHomePage = location.pathname === '/';
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    closeMenu();
+    navigate('/');
+  };
 
   useEffect(() => {
     // Always show navbar on non-home pages
@@ -75,18 +90,39 @@ const Navbar = () => {
           <div className="flex items-center gap-6">
             
             <div className="hidden md:flex items-center space-x-3">
-              <Link
-                to="/login"
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="px-4 py-2 text-sm font-medium text-white bg-slate-800 rounded-lg hover:bg-slate-900 transition-colors"
-              >
-                Sign Up
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                  >
+                    <FaUser />
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-800 rounded-lg hover:bg-slate-900 transition-colors"
+                  >
+                    <FaSignOutAlt />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="px-4 py-2 text-sm font-medium text-white bg-slate-800 rounded-lg hover:bg-slate-900 transition-colors"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Logo */}
@@ -121,22 +157,44 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="border-t border-slate-200 mt-2 pt-2">
-                <Link
-                  to="/login"
-                  onClick={closeMenu}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300"
-                >
-                  <span className="text-lg"></span>
-                  <span>Login</span>
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={closeMenu}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300"
-                >
-                  <span className="text-lg"></span>
-                  <span>Sign Up</span>
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={closeMenu}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300"
+                    >
+                      <FaUser className="text-lg" />
+                      <span>Profile</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300 w-full"
+                    >
+                      <FaSignOutAlt className="text-lg" />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={closeMenu}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300"
+                    >
+                      <FaUser className="text-lg" />
+                      <span>Login</span>
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={closeMenu}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300"
+                    >
+                      <FaUser className="text-lg" />
+                      <span>Sign Up</span>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
