@@ -75,7 +75,7 @@ const FeaturedIslands = () => {
               ))}
             </div>
 
-            <div className="text-center">
+            <div className="text-center animate-fade-in-up-delayed" style={{ animationDelay: `${islands.length * 0.1}s` }}>
               <Link
                 to="/islands"
                 className="inline-flex items-center gap-3 btn-primary text-base group"
