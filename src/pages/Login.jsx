@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight } from 'react-icons/fa';
 import axios from 'axios';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://explore-indian-island-backend.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -212,6 +213,8 @@ const Login = () => {
                         <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>or</span>
                         <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
                     </div>
+
+                    <GoogleAuthButton onError={setError} />
 
                     {/* Sign up link */}
                     <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.45)', fontSize: '0.875rem' }}>

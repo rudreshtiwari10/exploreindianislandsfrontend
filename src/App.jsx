@@ -9,6 +9,8 @@ import SearchResults from './pages/SearchResults';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import Explore from './pages/Explore';
+import PublicProfile from './pages/PublicProfile';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/user/:id" element={<PublicProfile />} />
           {/* Future routes for feature pages */}
           <Route path="/island/:id/hotels" element={<ComingSoon feature="Hotels" />} />
           <Route path="/island/:id/restaurants" element={<ComingSoon feature="Restaurants" />} />

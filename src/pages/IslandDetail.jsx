@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { islandsAPI } from '../api/islands';
+import { postsAPI, resolveImage } from '../api/posts';
 import ImageGallery from '../components/ImageGallery';
 import FeatureCard from '../components/FeatureCard';
 import {
@@ -23,6 +24,7 @@ const IslandDetail = () => {
   const [island, setIsland] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [communityPosts, setCommunityPosts] = useState([]);
 
   useEffect(() => {
     const fetchIsland = async () => {
@@ -40,6 +42,7 @@ const IslandDetail = () => {
     };
 
     fetchIsland();
+    postsAPI.getByIsland(id).then(r => setCommunityPosts(r.data || [])).catch(() => {});
   }, [id]);
 
   if (loading) {
@@ -201,7 +204,13 @@ const IslandDetail = () => {
         {/* Photo Gallery */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Photo Gallery</h2>
-          <ImageGallery images={island.images || []} />
+          <ImageGallery images={[
+            ...(island.images || []),
+            ...communityPosts.map(p => ({ url: resolveImage(p.imageUrl), caption: p.caption || `Shared by ${p.user?.name || 'a traveler'}` }))
+          ]} />
+          {communityPosts.length > 0 && (
+            <p className="text-sm text-slate-500 mt-4">{communityPosts.length} community photo{communityPosts.length !== 1 ? 's' : ''} shared by travelers</p>
+          )}
         </div>
 
         {/* Description */}

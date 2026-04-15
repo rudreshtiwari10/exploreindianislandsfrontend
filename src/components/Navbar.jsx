@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaEnvelope, FaMapMarkedAlt, FaBars, FaTimes, FaSignOutAlt, FaUser } from 'react-icons/fa';
+import { FaHome, FaEnvelope, FaMapMarkedAlt, FaBars, FaTimes, FaSignOutAlt, FaUser, FaCompass } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +47,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/', icon: <FaHome /> },
+    { name: 'Explore', path: '/explore', icon: <FaCompass /> },
     { name: 'Contact', path: '/contact', icon: <FaEnvelope /> },
     { name: 'Plan a trip', path: '/plan-trip', icon: <FaMapMarkedAlt /> },
   ];

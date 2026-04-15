@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCalendar, FaVenusMars, FaPen, FaSave, FaTimes, FaArrowLeft } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCalendar, FaVenusMars, FaPen, FaSave, FaTimes, FaArrowLeft, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
+import PostUpload from '../components/PostUpload';
+import { postsAPI, resolveImage } from '../api/posts';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://explore-indian-island-backend.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -13,6 +15,8 @@ const Profile = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
+
+    const [posts, setPosts] = useState([]);
 
     const [form, setForm] = useState({
         name: '',
@@ -40,6 +44,10 @@ const Profile = () => {
             });
             const data = res.data.data;
             setUser(data);
+            try {
+                const pr = await postsAPI.getByUser(data._id);
+                setPosts(pr.data.posts || []);
+            } catch (_) {}
             setForm({
                 name: data.name || '',
                 email: data.email || '',
@@ -120,7 +128,7 @@ const Profile = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-28 pb-16 px-4">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-3xl mx-auto">
                 {/* Back Button */}
                 <button
                     onClick={() => navigate(-1)}
@@ -320,6 +328,45 @@ const Profile = () => {
                             >
                                 <FaTimes /> Cancel
                             </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Post Upload */}
+                <div className="mt-6">
+                    <PostUpload onPosted={async () => {
+                        const pr = await postsAPI.getByUser(user._id);
+                        setPosts(pr.data.posts || []);
+                    }} />
+                </div>
+
+                {/* My Posts */}
+                <div className="mt-6 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 className="text-lg font-semibold text-slate-800 mb-4">My Posts ({posts.length})</h2>
+                    {posts.length === 0 ? (
+                        <p className="text-slate-500 text-sm">You haven't posted anything yet.</p>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {posts.map(p => (
+                                <div key={p._id} className="relative group aspect-square overflow-hidden rounded-xl bg-slate-100">
+                                    <img src={resolveImage(p.imageUrl)} alt={p.caption} className="w-full h-full object-cover" />
+                                    <button
+                                        onClick={async () => {
+                                            if (!confirm('Delete this post?')) return;
+                                            await postsAPI.remove(p._id);
+                                            setPosts(posts.filter(x => x._id !== p._id));
+                                        }}
+                                        className="absolute top-2 right-2 bg-white/90 text-red-600 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"
+                                    >
+                                        <FaTrash size={12} />
+                                    </button>
+                                    {p.island && (
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                            <p className="text-white text-xs flex items-center gap-1"><FaMapMarkerAlt />{p.island.name}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
