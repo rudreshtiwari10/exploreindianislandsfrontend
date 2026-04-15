@@ -20,7 +20,7 @@ const Islands = () => {
     const fetchIslands = async () => {
       try {
         setLoading(true);
-        const params = {};
+        const params = { limit: 200 };
         if (selectedGroup && selectedGroup !== 'All') params.group = selectedGroup;
         if (selectedVibe && selectedVibe !== 'All') params.vibe = selectedVibe;
         if (searchQuery) params.search = searchQuery;
