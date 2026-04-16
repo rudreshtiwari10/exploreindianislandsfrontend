@@ -17,7 +17,7 @@ const team = [
     name: 'Ritesh Kumar Mishra',
     role: 'Co-Creator',
     bio: 'Worked on building, refining and shaping Explore Indian Islands end-to-end. Believes good products are built by collaboration, not specialization.',
-    image: '/team/ritesh.jpg',
+    image: '/team/ritesh.jpeg',
     socials: { linkedin: 'https://www.linkedin.com/in/ritesh-kumar-mishra-a7b8b3249/', github: 'https://github.com/Ritesh-mishraa', twitter: '#' },
   },
   {
@@ -31,8 +31,8 @@ const team = [
     name: 'Jaya Gupta',
     role: 'Co-Creator',
     bio: 'Played a key role in building Explore Indian Islands from the ground up, contributing to its vision, structure and execution.',
-    image: '/team/jaya.jpg',
-    socials: { linkedin: '#', github: '#', twitter: '#' },
+    image: '/team/jaya.jpeg',
+    socials: { linkedin: 'https://www.linkedin.com/in/jaya-gupta-054265370/', github: '#', twitter: '#' },
   },
 ];
 
