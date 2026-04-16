@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Islands from './pages/Islands';
@@ -21,6 +21,15 @@ import FloatingActions from './components/FloatingActions';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 
+const RequireAuth = ({ children }) => {
+  const location = useLocation();
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search, reason: 'plan-trip' }} />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <Router>
@@ -33,7 +42,7 @@ function App() {
           <Route path="/island/:id" element={<IslandDetail />} />
           <Route path="/group/:groupName" element={<IslandGroup />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/plan-trip" element={<PlanTrip />} />
+          <Route path="/plan-trip" element={<RequireAuth><PlanTrip /></RequireAuth>} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

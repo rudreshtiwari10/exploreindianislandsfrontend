@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { islandsAPI } from '../api/islands';
 import { plannerAPI } from '../api/planner';
-import { FaSpinner, FaArrowLeft, FaStar, FaMapMarkerAlt, FaTag } from 'react-icons/fa';
+import { FaSpinner, FaArrowLeft, FaStar, FaMapMarkerAlt, FaTag, FaPlus } from 'react-icons/fa';
 
 const formatFeatureTitle = (type) => {
   return type.charAt(0).toUpperCase() + type.slice(1);
@@ -13,39 +13,76 @@ const IslandFeature = () => {
   const [island, setIsland] = useState(null);
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    let cancelled = false;
+
+    const fetchInitial = async () => {
       try {
         setLoading(true);
-        // 1. Fetch island name
+        setFeatures([]);
+        setError(null);
+
         const islandRes = await islandsAPI.getIslandById(id);
         const fetchedIsland = islandRes.data;
+        if (cancelled) return;
         setIsland(fetchedIsland);
 
-        // 2. Fetch AI Contextual Feature Data
         const aiRes = await plannerAPI.getFeatureData({
           islandName: fetchedIsland.name,
           featureType: formatFeatureTitle(featureType),
+          offset: 0,
+          limit: 4,
         });
+        if (cancelled) return;
 
-        if (aiRes.success && aiRes.data) {
+        if (aiRes.success && aiRes.data && aiRes.data.length > 0) {
           setFeatures(aiRes.data);
+          setHasMore(aiRes.hasMore !== false);
         } else {
-          throw new Error('Failed to parse AI data');
+          throw new Error(aiRes.message || 'No results returned');
         }
-        setError(null);
       } catch (err) {
+        if (cancelled) return;
         console.error(err);
-        setError(`Failed to fetch authentic data for ${formatFeatureTitle(featureType)}.`);
+        const msg = err?.response?.data?.message || err.message || `Failed to fetch data for ${formatFeatureTitle(featureType)}.`;
+        setError(msg);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    fetchData();
+    fetchInitial();
+    return () => { cancelled = true; };
   }, [id, featureType]);
+
+  const handleShowMore = async () => {
+    if (!island || loadingMore) return;
+    try {
+      setLoadingMore(true);
+      const aiRes = await plannerAPI.getFeatureData({
+        islandName: island.name,
+        featureType: formatFeatureTitle(featureType),
+        offset: features.length,
+        limit: 2,
+      });
+      if (aiRes.success && aiRes.data && aiRes.data.length > 0) {
+        setFeatures(prev => [...prev, ...aiRes.data]);
+        setHasMore(aiRes.hasMore !== false);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error(err);
+      const msg = err?.response?.data?.message || 'Could not load more. Please try again.';
+      setError(msg);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -113,16 +150,18 @@ const IslandFeature = () => {
             >
               {/* Image Section */}
               <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden bg-slate-100">
-                <img 
-                  // Fallback string manipulation to get contextual images if Unsplash Source doesn't route properly
-                  src={`https://source.unsplash.com/800x800/?${encodeURIComponent(item.imageKeyword || title + ',' + island.name)}`}
-                  alt={item.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  onError={(e) => {
-                     // Fallback mechanism if source.unsplash fails
-                     e.target.src = "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800";
-                  }}
-                />
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-100 via-teal-50 to-blue-100 text-emerald-700 text-4xl font-light">
+                    {item.name?.charAt(0) || '?'}
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
                   <span className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-xs font-bold text-slate-900 shadow-sm">
@@ -158,6 +197,35 @@ const IslandFeature = () => {
             </div>
           ))}
         </div>
+
+        {/* Show more */}
+        {hasMore && (
+          <div className="mt-12 flex justify-center">
+            <button
+              onClick={handleShowMore}
+              disabled={loadingMore}
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-xl shadow-emerald-500/25 hover:scale-105 transition disabled:opacity-60 disabled:hover:scale-100"
+            >
+              {loadingMore ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  <span>Fetching more {title.toLowerCase()}...</span>
+                </>
+              ) : (
+                <>
+                  <FaPlus />
+                  <span>Show More {title}</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
+        {!hasMore && features.length > 0 && (
+          <p className="mt-12 text-center text-sm text-slate-400 font-light">
+            You've seen everything our guide has for {title.toLowerCase()} on {island.name}.
+          </p>
+        )}
       </div>
     </div>
   );

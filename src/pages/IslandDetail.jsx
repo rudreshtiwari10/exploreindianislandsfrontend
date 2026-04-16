@@ -4,6 +4,7 @@ import { islandsAPI } from '../api/islands';
 import { postsAPI, resolveImage } from '../api/posts';
 import ImageGallery from '../components/ImageGallery';
 import FeatureCard from '../components/FeatureCard';
+import WeatherCard from '../components/WeatherCard';
 import {
   FaSpinner,
   FaMapMarkerAlt,
@@ -208,6 +209,15 @@ const IslandDetail = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Live Weather */}
+        <div className="mb-8">
+          <WeatherCard
+            lat={island.location?.coordinates?.lat}
+            lng={island.location?.coordinates?.lng}
+            islandName={island.name}
+          />
         </div>
 
         {/* Photo Gallery */}

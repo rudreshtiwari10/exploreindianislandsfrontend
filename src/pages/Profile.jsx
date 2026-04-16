@@ -82,16 +82,23 @@ const Profile = () => {
         setSuccess('');
         const token = localStorage.getItem('token');
         try {
-            const { email, ...updateData } = form;
+            const { email, ...rest } = form;
+            // Mongoose can't cast '' → Date, so send null when empty
+            const updateData = {
+                ...rest,
+                dateOfBirth: rest.dateOfBirth ? rest.dateOfBirth : null,
+            };
             const res = await axios.put(`${API_BASE_URL}/auth/updateprofile`, updateData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUser(res.data.data);
+            localStorage.setItem('user', JSON.stringify(res.data.data));
             setEditing(false);
             setSuccess('Profile updated successfully!');
             setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to update profile.');
+            const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Failed to update profile.';
+            setError(msg);
         } finally {
             setSaving(false);
         }
