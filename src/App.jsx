@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Islands from './pages/Islands';
 import IslandDetail from './pages/IslandDetail';
+import IslandGroup from './pages/IslandGroup';
+import IslandFeature from './pages/IslandFeature';
 import Contact from './pages/Contact';
 import PlanTrip from './pages/PlanTrip';
 import SearchResults from './pages/SearchResults';
@@ -11,16 +13,25 @@ import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
 import PublicProfile from './pages/PublicProfile';
+import PostDetail from './pages/PostDetail';
+import ForgotPassword from './pages/ForgotPassword';
+import NewPost from './pages/NewPost';
+import About from './pages/About';
+import FloatingActions from './components/FloatingActions';
+import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen">
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/islands" element={<Islands />} />
           <Route path="/island/:id" element={<IslandDetail />} />
+          <Route path="/group/:groupName" element={<IslandGroup />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/plan-trip" element={<PlanTrip />} />
           <Route path="/search" element={<SearchResults />} />
@@ -29,39 +40,16 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/user/:id" element={<PublicProfile />} />
-          {/* Future routes for feature pages */}
-          <Route path="/island/:id/hotels" element={<ComingSoon feature="Hotels" />} />
-          <Route path="/island/:id/restaurants" element={<ComingSoon feature="Restaurants" />} />
-          <Route path="/island/:id/temples" element={<ComingSoon feature="Temples" />} />
-          <Route path="/island/:id/activities" element={<ComingSoon feature="Things to Do" />} />
-          <Route path="/island/:id/beaches" element={<ComingSoon feature="Beaches" />} />
-          <Route path="/island/:id/cuisines" element={<ComingSoon feature="Cuisines" />} />
+          <Route path="/post/:id" element={<PostDetail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/new-post" element={<NewPost />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/island/:id/:featureType" element={<IslandFeature />} />
         </Routes>
+        <Footer />
+        <FloatingActions />
       </div>
     </Router>
   );
 }
-
-// Coming Soon Component for feature pages
-const ComingSoon = ({ feature }) => {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-ocean-50 to-white pt-24 pb-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          {feature}
-        </h1>
-        <p className="text-xl text-gray-600 mb-8">
-          This feature is coming soon! We're working hard to bring you detailed information about {feature.toLowerCase()}.
-        </p>
-        <button
-          onClick={() => window.history.back()}
-          className="btn-primary"
-        >
-          Go Back
-        </button>
-      </div>
-    </div>
-  );
-};
-
 export default App;

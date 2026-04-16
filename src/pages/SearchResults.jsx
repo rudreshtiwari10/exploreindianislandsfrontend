@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { islandsAPI } from '../api/islands';
 import IslandCard from '../components/IslandCard';
 import { FaSpinner, FaSearch, FaExclamationTriangle } from 'react-icons/fa';
@@ -17,6 +17,7 @@ const KNOWN_ISLANDS = [
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
+  const navigate = useNavigate();
   const [islands, setIslands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,6 +27,14 @@ const SearchResults = () => {
     const fetchResults = async () => {
       if (!searchQuery.trim()) {
         setLoading(false);
+        return;
+      }
+
+      // Check if search query exactly matches a major group
+      const majorGroups = ['Andaman', 'Nicobar', 'Lakshadweep', 'Offshore Mainland'];
+      const exactMatchGroup = majorGroups.find(g => g.toLowerCase() === searchQuery.trim().toLowerCase());
+      if (exactMatchGroup) {
+        navigate(`/group/${encodeURIComponent(exactMatchGroup)}`, { replace: true });
         return;
       }
 

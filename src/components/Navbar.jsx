@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaEnvelope, FaMapMarkedAlt, FaBars, FaTimes, FaSignOutAlt, FaUser, FaCompass } from 'react-icons/fa';
+import { FaHome, FaEnvelope, FaMapMarkedAlt, FaBars, FaTimes, FaSignOutAlt, FaUser, FaCompass, FaInfoCircle, FaCog } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === '/';
@@ -14,6 +16,16 @@ const Navbar = () => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
   }, [location]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -48,8 +60,9 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', path: '/', icon: <FaHome /> },
     { name: 'Explore', path: '/explore', icon: <FaCompass /> },
-    { name: 'Contact', path: '/contact', icon: <FaEnvelope /> },
     { name: 'Plan a trip', path: '/plan-trip', icon: <FaMapMarkedAlt /> },
+    { name: 'Contact', path: '/contact', icon: <FaEnvelope /> },
+    { name: 'About', path: '/about', icon: <FaInfoCircle /> },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -76,6 +89,7 @@ const Navbar = () => {
                 <span>{link.name}</span>
               </Link>
             ))}
+            {/* Highlighted Explore/NewPost removed from here, Explore moved to navLinks */}
           </div>
 
           {/* Mobile menu button */}
@@ -92,22 +106,41 @@ const Navbar = () => {
             
             <div className="hidden md:flex items-center space-x-3">
               {isLoggedIn ? (
-                <>
-                  <Link
-                    to="/profile"
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-                  >
-                    <FaUser />
-                    Profile
-                  </Link>
+                <div 
+                  className="relative group py-2" 
+                  ref={profileDropdownRef}
+                  onMouseEnter={() => setIsProfileDropdownOpen(true)}
+                  onMouseLeave={() => setIsProfileDropdownOpen(false)}
+                >
                   <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-800 rounded-lg hover:bg-slate-900 transition-colors"
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors focus:outline-none"
                   >
-                    <FaSignOutAlt />
-                    Logout
+                    <FaUser className="text-emerald-600" />
+                    Profile
                   </button>
-                </>
+                  
+                  {isProfileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-slate-100 py-2 z-50 animate-fade-in-up">
+                      <Link
+                        to="/profile"
+                        onClick={() => { setIsProfileDropdownOpen(false); closeMenu(); }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                      >
+                        <FaCog className="text-slate-400" />
+                        Profile Setting
+                      </Link>
+                      <div className="h-px bg-slate-100 my-1 mx-2" />
+                      <button
+                        onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                      >
+                        <FaSignOutAlt className="text-rose-400" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <>
                   <Link
@@ -165,14 +198,14 @@ const Navbar = () => {
                       onClick={closeMenu}
                       className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300"
                     >
-                      <FaUser className="text-lg" />
-                      <span>Profile</span>
+                      <FaCog className="text-lg text-slate-400" />
+                      <span>Profile Setting</span>
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all duration-300 w-full"
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-all duration-300 w-full"
                     >
-                      <FaSignOutAlt className="text-lg" />
+                      <FaSignOutAlt className="text-lg text-rose-400" />
                       <span>Logout</span>
                     </button>
                   </>

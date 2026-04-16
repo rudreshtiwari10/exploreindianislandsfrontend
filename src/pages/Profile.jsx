@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCalendar, FaVenusMars, FaPen, FaSave, FaTimes, FaArrowLeft, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
 import PostUpload from '../components/PostUpload';
-import { postsAPI, resolveImage } from '../api/posts';
+import Avatar from '../components/Avatar';
+import { postsAPI, resolveImage, usersAPI } from '../api/posts';
+import { FaCamera } from 'react-icons/fa';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -109,9 +111,18 @@ const Profile = () => {
         setError('');
     };
 
-    const getInitials = (name) => {
-        if (!name) return '?';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const res = await usersAPI.uploadAvatar(file);
+            setUser(res.data);
+            localStorage.setItem('user', JSON.stringify(res.data));
+            setSuccess('Profile picture updated!');
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError('Failed to upload avatar.');
+        }
     };
 
     if (loading) {
@@ -142,8 +153,12 @@ const Profile = () => {
                     <div className="h-32 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600"></div>
                     <div className="px-8 pb-8 relative">
                         {/* Avatar */}
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-lg -mt-12 relative">
-                            {getInitials(user?.name)}
+                        <div className="-mt-12 relative inline-block group">
+                            <Avatar user={user} size="xl" className="border-4 border-white shadow-lg" />
+                            <label className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center cursor-pointer shadow-lg border-2 border-white transition">
+                                <FaCamera size={14} />
+                                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                            </label>
                         </div>
 
                         <div className="mt-4 flex items-start justify-between">

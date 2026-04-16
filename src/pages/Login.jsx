@@ -177,6 +177,18 @@ const Login = () => {
                             </div>
                         </div>
 
+                        {/* Forgot password */}
+                        <div className="flex justify-end -mt-1">
+                            <Link
+                                to="/forgot-password"
+                                style={{ color: '#7dd3fc', fontSize: '0.78rem', textDecoration: 'none', fontWeight: 500 }}
+                                onMouseEnter={e => e.target.style.color = '#bae6fd'}
+                                onMouseLeave={e => e.target.style.color = '#7dd3fc'}
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
+
                         {/* Submit */}
                         <button
                             type="submit"

@@ -87,7 +87,7 @@ const CIRCUITS = [
 
 const PlanTrip = () => {
   const [searchParams] = useSearchParams();
-  const preselectedIslandId = searchParams.get('island');
+  const preselectedIslandId = searchParams.get('island') || searchParams.get('islandId');
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);

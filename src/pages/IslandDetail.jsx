@@ -17,6 +17,7 @@ import {
   FaExternalLinkAlt,
   FaShieldAlt,
   FaUsers,
+  FaPlane,
 } from 'react-icons/fa';
 
 const IslandDetail = () => {
@@ -145,7 +146,7 @@ const IslandDetail = () => {
               </div>
 
               {/* Status Badges */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-6">
                 {island.status?.isInhabited && (
                   <span className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
                     <FaUsers /> Inhabited
@@ -162,6 +163,14 @@ const IslandDetail = () => {
                   </span>
                 )}
               </div>
+              
+              {/* Action Button */}
+              <Link 
+                to={`/plan-trip?islandId=${island._id}`}
+                className="inline-flex w-full md:w-auto items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-emerald-500/30 transition-all transform hover:-translate-y-1"
+              >
+                <FaPlane className="text-xl" /> Plan a Trip Here
+              </Link>
             </div>
 
             {/* Best Time to Visit */}

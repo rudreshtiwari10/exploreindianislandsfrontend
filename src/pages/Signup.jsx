@@ -1,20 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaShieldAlt } from 'react-icons/fa';
 import axios from 'axios';
 import GoogleAuthButton from '../components/GoogleAuthButton';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const Signup = () => {
+    const [step, setStep] = useState('form'); // 'form' | 'otp'
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [otp, setOtp] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [resendCooldown, setResendCooldown] = useState(0);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+        const t = setTimeout(() => setResendCooldown(c => c - 1), 1000);
+        return () => clearTimeout(t);
+    }, [resendCooldown]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,23 +37,60 @@ const Signup = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+            await axios.post(`${API_BASE_URL}/auth/register`, {
                 name,
                 email,
                 password,
                 role: 'user',
             });
-            if (response.data?.token) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user || {}));
-            }
-            setSuccess('Account created! Redirecting...');
-            setTimeout(() => navigate('/islands'), 1500);
+            setSuccess(`Verification code sent to ${email}`);
+            setStep('otp');
+            setResendCooldown(60);
         } catch (err) {
             const msg = err?.response?.data?.message || 'Signup failed. Please try again.';
             setError(msg);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleVerify = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        if (otp.length !== 6) {
+            setError('Please enter the 6-digit code.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await axios.post(`${API_BASE_URL}/auth/verifysignup`, { email, otp });
+            if (response.data?.token) {
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.user || {}));
+            }
+            setSuccess('Account verified! Redirecting...');
+            setTimeout(() => navigate('/islands'), 1200);
+        } catch (err) {
+            const msg = err?.response?.data?.message || 'Verification failed.';
+            setError(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResend = async () => {
+        if (resendCooldown > 0) return;
+        setError('');
+        setSuccess('');
+        try {
+            await axios.post(`${API_BASE_URL}/auth/register`, { name, email, password, role: 'user' });
+            setSuccess('A new code has been sent.');
+            setResendCooldown(60);
+        } catch (err) {
+            setError(err?.response?.data?.message || 'Could not resend code.');
         }
     };
 
@@ -136,10 +182,12 @@ const Signup = () => {
                 }}>
                     <div className="mb-3">
                         <h2 style={{ fontSize: '1.35rem', fontWeight: 300, color: 'white', marginBottom: '0.2rem' }}>
-                            Create account
+                            {step === 'form' ? 'Create account' : 'Verify your email'}
                         </h2>
                         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 300 }}>
-                            Start exploring India&apos;s most beautiful islands
+                            {step === 'form'
+                                ? 'Start exploring India\u2019s most beautiful islands'
+                                : `We sent a 6-digit code to ${email}`}
                         </p>
                     </div>
 
@@ -173,6 +221,69 @@ const Signup = () => {
                         </div>
                     )}
 
+                    {step === 'otp' ? (
+                        <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div>
+                                <label style={labelStyle}>Verification Code</label>
+                                <div style={{ position: 'relative' }}>
+                                    <FaShieldAlt style={iconStyle} />
+                                    <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        maxLength={6}
+                                        required
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                                        placeholder="123456"
+                                        style={{ ...inputStyle, letterSpacing: '0.4em', textAlign: 'center', fontSize: '1.1rem' }}
+                                        onFocus={onFocus}
+                                        onBlur={onBlur}
+                                        autoFocus
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                style={{
+                                    marginTop: '0.25rem', width: '100%', padding: '0.7rem',
+                                    background: loading ? 'rgba(16,185,129,0.4)' : 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
+                                    border: 'none', borderRadius: '0.875rem',
+                                    color: 'white', fontWeight: 600, fontSize: '0.95rem',
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                    transition: 'all 0.4s ease',
+                                    boxShadow: '0 8px 25px rgba(16,185,129,0.35)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                }}
+                            >
+                                {loading ? <span>Verifying...</span> : <><span>Verify & Continue</span><FaArrowRight style={{ fontSize: '0.8rem' }} /></>}
+                            </button>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', marginTop: '0.25rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => { setStep('form'); setOtp(''); setError(''); setSuccess(''); }}
+                                    style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', padding: 0 }}
+                                >
+                                    ← Edit details
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleResend}
+                                    disabled={resendCooldown > 0}
+                                    style={{
+                                        background: 'none', border: 'none', padding: 0,
+                                        color: resendCooldown > 0 ? 'rgba(255,255,255,0.3)' : '#34d399',
+                                        cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer',
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+                                </button>
+                            </div>
+                        </form>
+                    ) : (
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {/* Full Name */}
                         <div>
@@ -264,27 +375,32 @@ const Signup = () => {
                             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(16,185,129,0.35)'; }}
                         >
                             {loading ? (
-                                <span>Creating account...</span>
+                                <span>Sending code...</span>
                             ) : (
                                 <>
-                                    <span>Create Account</span>
+                                    <span>Send Verification Code</span>
                                     <FaArrowRight style={{ fontSize: '0.8rem' }} />
                                 </>
                             )}
                         </button>
                     </form>
+                    )}
 
-                    {/* Divider */}
-                    <div style={{ display: 'flex', alignItems: 'center', margin: '0.75rem 0', gap: '1rem' }}>
-                        <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-                        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>or</span>
-                        <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-                    </div>
+                    {step === 'form' && (
+                      <>
+                        {/* Divider */}
+                        <div style={{ display: 'flex', alignItems: 'center', margin: '0.75rem 0', gap: '1rem' }}>
+                            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                            <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>or</span>
+                            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                        </div>
 
-                    <GoogleAuthButton onError={setError} />
+                        <GoogleAuthButton onError={setError} />
+                      </>
+                    )}
 
                     {/* Login link */}
-                    <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.45)', fontSize: '0.875rem' }}>
+                    <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.45)', fontSize: '0.875rem', marginTop: step === 'otp' ? '0.75rem' : 0 }}>
                         Already have an account?{' '}
                         <Link
                             to="/login"

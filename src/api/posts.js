@@ -16,6 +16,7 @@ export const resolveImage = (url) => {
 
 export const postsAPI = {
   getAll: async () => (await axios.get(`${API_BASE_URL}/posts`)).data,
+  getById: async (id) => (await axios.get(`${API_BASE_URL}/posts/${id}`)).data,
   getByUser: async (userId) => (await axios.get(`${API_BASE_URL}/posts/user/${userId}`)).data,
   getByIsland: async (islandId) => (await axios.get(`${API_BASE_URL}/posts/island/${islandId}`)).data,
   create: async ({ image, caption, island }) => {
@@ -29,4 +30,20 @@ export const postsAPI = {
     return res.data;
   },
   remove: async (id) => (await axios.delete(`${API_BASE_URL}/posts/${id}`, { headers: authHeader() })).data,
+  toggleLike: async (id) => (await axios.post(`${API_BASE_URL}/posts/${id}/like`, {}, { headers: authHeader() })).data,
+  addComment: async (id, text) => (await axios.post(`${API_BASE_URL}/posts/${id}/comment`, { text }, { headers: authHeader() })).data,
+  deleteComment: async (id, commentId) => (await axios.delete(`${API_BASE_URL}/posts/${id}/comment/${commentId}`, { headers: authHeader() })).data,
+  addReply: async (id, commentId, text) => (await axios.post(`${API_BASE_URL}/posts/${id}/comment/${commentId}/reply`, { text }, { headers: authHeader() })).data,
+  deleteReply: async (id, commentId, replyId) => (await axios.delete(`${API_BASE_URL}/posts/${id}/comment/${commentId}/reply/${replyId}`, { headers: authHeader() })).data,
+};
+
+export const usersAPI = {
+  toggleFollow: async (id) => (await axios.post(`${API_BASE_URL}/users/${id}/follow`, {}, { headers: authHeader() })).data,
+  uploadAvatar: async (file) => {
+    const fd = new FormData();
+    fd.append('avatar', file);
+    return (await axios.post(`${API_BASE_URL}/users/avatar`, fd, {
+      headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' },
+    })).data;
+  },
 };

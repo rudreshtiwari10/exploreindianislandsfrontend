@@ -13,8 +13,8 @@ const Islands = () => {
   const [selectedVibe, setSelectedVibe] = useState(searchParams.get('vibe') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
-  const islandGroups = ['All', 'Andaman', 'Nicobar', 'Lakshadweep', 'Offshore Mainlined', 'Other'];
-  const vibes = ['All', 'Scuba', 'Quiet', 'Historical', 'Bird Watching', 'Adventure', 'Romantic'];
+  const islandGroups = ['All', 'Andaman', 'Nicobar', 'Lakshadweep', 'Arabian Sea', 'Offshore Mainland', 'River Island', 'Other'];
+  const vibes = ['All', 'Scuba', 'Quiet', 'Historical', 'Bird Watching', 'Adventure', 'Romantic', 'Beach', 'Coral'];
 
   useEffect(() => {
     const fetchIslands = async () => {
