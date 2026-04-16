@@ -18,7 +18,7 @@ const STEPS = [
   { id: 5, title: 'Your Itinerary', icon: <FaCheck /> },
 ];
 
-// ─── Pre-built Island Circuits ──────────────────────────
+// ─── Pre-built Island Circuits helloo ──────────────────────────
 const CIRCUITS = [
   {
     id: 'andaman-popular',
