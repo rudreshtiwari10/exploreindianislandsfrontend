@@ -238,7 +238,13 @@ const PlanTrip = () => {
       });
       setAccommodationData(res.data);
       setCurrentStep(3);
-    } catch (err) { setError(err.response?.data?.error || 'Failed to fetch accommodations.'); }
+    } catch (err) {
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setError('Request timed out. The AI service is busy — please try again in a moment.');
+      } else {
+        setError(err.response?.data?.error || 'Failed to fetch accommodations.');
+      }
+    }
     finally { setLoading(false); }
   };
 
