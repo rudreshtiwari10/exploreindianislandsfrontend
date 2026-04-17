@@ -1,163 +1,306 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  FaEnvelope, FaLock, FaShieldAlt, FaEye, FaEyeSlash, FaArrowRight
+} from 'react-icons/fa';
+import { MdTravelExplore } from 'react-icons/md';
 import axios from 'axios';
-import { FaEnvelope, FaKey, FaLock, FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
+import AquaticScene from '../components/AquaticScene';
+import './styles/auth.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
+// ── Password strength meter ───────────────────────────────────────────────────
+const PasswordStrength = ({ password }) => {
+  if (!password) return null;
+
+  const score = password.length < 6 ? 1
+    : password.length < 8 ? 2
+    : /[A-Z]/.test(password) && /[0-9]/.test(password) ? 4
+    : 3;
+
+  const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+  const labels = ['Weak',    'Fair',    'Good',    'Strong' ];
+
+  return (
+    <div className="pw-strength">
+      <div className="pw-strength-bars">
+        {[1, 2, 3, 4].map(i => (
+          <div
+            key={i}
+            className="pw-strength-bar"
+            style={{ background: i <= score ? colors[score - 1] : 'rgba(0,212,255,0.1)' }}
+          />
+        ))}
+      </div>
+      <span className="pw-strength-label" style={{ color: colors[score - 1] }}>
+        {labels[score - 1]}
+      </span>
+    </div>
+  );
+};
+
 const ForgotPassword = () => {
-  const [step, setStep] = useState(1); // 1: email, 2: otp+new pass
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [step, setStep]                 = useState('email'); // 'email' | 'otp'
+  const [email, setEmail]               = useState('');
+  const [otp, setOtp]                   = useState('');
+  const [password, setPassword]         = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState('');
+  const [success, setSuccess]           = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
   const navigate = useNavigate();
 
-  const sendOtp = async (e) => {
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    setError(''); setSuccess(''); setLoading(true);
+    setError('');
+    setSuccess('');
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/auth/forgotpassword`, { email });
-      setSuccess('OTP sent to your email');
-      setStep(2);
+      setSuccess(`Reset code sent to ${email}`);
+      setStep('otp');
+      setResendCooldown(60);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to send OTP');
-    } finally { setLoading(false); }
+      setError(err?.response?.data?.error || 'Failed to send reset code. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const resendOtp = async () => {
-    setError(''); setSuccess(''); setLoading(true);
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    setError('');
+    setSuccess('');
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/auth/resendotp`, { email });
-      setSuccess('OTP resent');
+      setSuccess('A new reset code has been sent.');
+      setResendCooldown(60);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to resend OTP');
-    } finally { setLoading(false); }
+      setError(err?.response?.data?.error || 'Could not resend code.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const reset = async (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
-    setError(''); setSuccess('');
-    if (password.length < 6) return setError('Password must be at least 6 characters');
+    setError('');
+    setSuccess('');
+    if (otp.length !== 6) {
+      setError('Please enter the 6-digit code.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
     setLoading(true);
     try {
       await axios.put(`${API_BASE_URL}/auth/resetpassword`, { email, otp, password });
-      setSuccess('Password reset! Redirecting to login...');
+      setSuccess('Password reset successfully! Redirecting...');
       setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to reset password');
-    } finally { setLoading(false); }
+      setError(err?.response?.data?.error || 'Failed to reset password. Please check your code.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-4"
-      style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #0d3b2e 100%)' }}
-    >
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-4">
-          <Link to="/" className="inline-block">
-            <h1 className="text-2xl font-light text-white tracking-widest">
-              EXPLORE <span className="font-bold">ISLANDS</span>
-            </h1>
-            <p className="text-[10px] text-white/45 tracking-[0.25em] uppercase mt-1">India</p>
-          </Link>
-        </div>
+    <div className="auth-root">
+      {/* ── Animated ocean background ── */}
+      <AquaticScene />
 
-        <div
-          className="rounded-3xl p-6 shadow-2xl border border-white/12"
-          style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(24px)' }}
-        >
-          <h2 className="text-2xl font-light text-white mb-1">Reset password</h2>
-          <p className="text-white/50 text-sm mb-5">
-            {step === 1 ? "We'll email you a one-time code" : 'Enter the code we sent and your new password'}
+      {/* ── Forgot Password card ── */}
+      <div className="auth-card-wrapper">
+        <div className="auth-card">
+
+          {/* Logo */}
+          <Link to="/" className="auth-logo-link">
+            <div className="auth-logo-icon">
+              <MdTravelExplore style={{ color: 'white' }} />
+            </div>
+            <div className="auth-logo-text">
+              <h1>EXPLORE ISLANDS</h1>
+              <p>India</p>
+            </div>
+          </Link>
+
+          {/* Heading */}
+          <h2 className="auth-heading">
+            {step === 'email' ? 'Forgot Password? 🔐' : 'Reset Password ✨'}
+          </h2>
+          <p className="auth-subheading">
+            {step === 'email'
+              ? "No worries! We'll send you a recovery code."
+              : `Enter the code we sent to ${email}`}
           </p>
 
+          {/* Alerts */}
           {error && (
-            <div className="bg-red-500/15 border border-red-500/30 rounded-lg px-4 py-2.5 text-red-300 text-sm mb-3">
-              {error}
+            <div className="auth-error-box">
+              <span>⚠️</span> {error}
             </div>
           )}
           {success && (
-            <div className="bg-emerald-500/15 border border-emerald-500/30 rounded-lg px-4 py-2.5 text-emerald-300 text-sm mb-3 flex items-center gap-2">
-              <FaCheckCircle /> {success}
+            <div className="auth-success-box">
+              <span>✅</span> {success}
             </div>
           )}
 
-          {step === 1 ? (
-            <form onSubmit={sendOtp} className="space-y-4">
-              <div className="relative">
-                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35 text-sm" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full pl-11 pr-4 py-3 bg-white/7 border border-white/12 rounded-2xl text-white text-sm outline-none focus:border-emerald-400 transition"
-                />
+          {step === 'otp' ? (
+            /* ── Reset Step ── */
+            <form onSubmit={handleResetPassword}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="reset-otp">Verification Code</label>
+                <div className="input-wrap">
+                  <FaShieldAlt className="input-icon" />
+                  <input
+                    id="reset-otp"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    required
+                    className="auth-input otp-input"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="• • • • • •"
+                    autoFocus
+                  />
+                </div>
+                <div className="otp-helper">
+                  <button
+                    type="button"
+                    className="otp-edit-btn"
+                    onClick={() => { setStep('email'); setOtp(''); setError(''); setSuccess(''); }}
+                  >
+                    ← Edit email
+                  </button>
+                  <button
+                    type="button"
+                    className="otp-resend-btn"
+                    onClick={handleResend}
+                    disabled={resendCooldown > 0 || loading}
+                    style={{
+                      color: resendCooldown > 0 ? 'rgba(140,210,240,0.25)' : '#34d399',
+                      cursor: resendCooldown > 0 || loading ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+                  </button>
+                </div>
               </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label className="form-label" htmlFor="reset-password">New Password</label>
+                <div className="input-wrap">
+                  <FaLock className="input-icon" />
+                  <input
+                    id="reset-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    className="auth-input has-right-btn"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="Min. 6 characters"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className="toggle-pw-btn"
+                    onClick={() => setShowPassword(v => !v)}
+                    aria-label="Toggle password"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+                <PasswordStrength password={password} />
+              </div>
+
               <button
                 type="submit"
+                id="reset-submit-btn"
+                className="auth-submit-btn signup-btn"
                 disabled={loading}
-                className="w-full py-3 rounded-2xl text-white font-semibold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:shadow-lg disabled:opacity-50 transition"
               >
-                {loading ? 'Sending...' : 'Send OTP'}
+                {loading ? (
+                  <>
+                    <div className="btn-spinner" />
+                    <span>Resetting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Reset Password</span>
+                    <FaArrowRight style={{ fontSize: '0.85rem' }} />
+                  </>
+                )}
               </button>
             </form>
           ) : (
-            <form onSubmit={reset} className="space-y-4">
-              <div className="relative">
-                <FaKey className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35 text-sm" />
-                <input
-                  type="text"
-                  required
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="6-digit OTP"
-                  maxLength={6}
-                  className="w-full pl-11 pr-4 py-3 bg-white/7 border border-white/12 rounded-2xl text-white text-sm outline-none focus:border-emerald-400 transition tracking-widest"
-                />
+            /* ── Email Step ── */
+            <form onSubmit={handleSendOtp}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="forgot-email">Email Address</label>
+                <div className="input-wrap">
+                  <FaEnvelope className="input-icon" />
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    required
+                    className="auth-input"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    autoFocus
+                  />
+                </div>
               </div>
-              <div className="relative">
-                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35 text-sm" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="New password (min 6 chars)"
-                  className="w-full pl-11 pr-4 py-3 bg-white/7 border border-white/12 rounded-2xl text-white text-sm outline-none focus:border-emerald-400 transition"
-                />
-              </div>
+
               <button
                 type="submit"
+                id="forgot-submit-btn"
+                className="auth-submit-btn signup-btn"
                 disabled={loading}
-                className="w-full py-3 rounded-2xl text-white font-semibold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:shadow-lg disabled:opacity-50 transition"
               >
-                {loading ? 'Resetting...' : 'Reset Password'}
-              </button>
-              <button type="button" onClick={resendOtp} disabled={loading} className="w-full text-white/60 text-xs hover:text-white/90">
-                Didn't get it? Resend OTP
+                {loading ? (
+                  <>
+                    <div className="btn-spinner" />
+                    <span>Sending Code...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Get Reset Code</span>
+                    <FaArrowRight style={{ fontSize: '0.85rem' }} />
+                  </>
+                )}
               </button>
             </form>
           )}
 
-          <p className="text-center text-white/45 text-sm mt-5">
-            Remembered it?{' '}
-            <Link to="/login" className="text-emerald-400 font-semibold hover:text-emerald-300">
-              Back to sign in
-            </Link>
-          </p>
-        </div>
+          <div className="auth-divider">
+            <div className="auth-divider-line" />
+            <span className="auth-divider-text">Oh, I remember!</span>
+            <div className="auth-divider-line" />
+          </div>
 
-        <p className="text-center mt-3">
-          <Link to="/" className="text-white/30 text-xs hover:text-white/60 inline-flex items-center gap-1">
-            <FaArrowLeft size={10} /> Back to Home
-          </Link>
-        </p>
+          <p className="auth-link-row" style={{ marginTop: '0' }}>
+            <Link to="/login">Back to Sign In</Link>
+          </p>
+
+          <Link to="/" className="auth-back-link">← Back to Home</Link>
+
+        </div>
       </div>
     </div>
   );

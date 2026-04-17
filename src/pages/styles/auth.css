@@ -1,0 +1,864 @@
+/* ======================================================================
+   auth.css — Shared Auth Pages Stylesheet
+   Explore Indian Islands
+   ====================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&display=swap');
+
+/* ======================================================================
+   1. OCEAN ROOT
+   ====================================================================== */
+.auth-root {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse 90% 65% at 50% -5%, #0c3f5c 0%, #061a34 42%, #020c1d 100%);
+}
+
+/* ======================================================================
+   2. AMBIENT BIOLUMINESCENT ORBS
+   ====================================================================== */
+.ocean-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(75px);
+}
+
+.ocean-orb-1 {
+  width: 48vw;
+  height: 48vw;
+  top: -14%;
+  left: -8%;
+  background: radial-gradient(circle, rgba(0, 174, 255, 0.22) 0%, transparent 65%);
+  animation: orbPulse 9s ease-in-out infinite;
+}
+
+.ocean-orb-2 {
+  width: 55vw;
+  height: 55vw;
+  bottom: -22%;
+  right: -14%;
+  background: radial-gradient(circle, rgba(80, 28, 210, 0.16) 0%, transparent 65%);
+  animation: orbPulse 11s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+.ocean-orb-3 {
+  width: 36vw;
+  height: 36vw;
+  top: 38%;
+  left: 62%;
+  background: radial-gradient(circle, rgba(16, 175, 128, 0.13) 0%, transparent 65%);
+  animation: orbPulse 7s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+@keyframes orbPulse {
+  0%,  100% { transform: scale(1);    opacity: 0.65; }
+  50%        { transform: scale(1.32); opacity: 1;    }
+}
+
+/* ======================================================================
+   3. SURFACE LIGHT RAYS
+   ====================================================================== */
+.light-rays {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 62%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.light-ray {
+  position: absolute;
+  top: 0;
+  transform-origin: top center;
+  pointer-events: none;
+  animation: rayFlicker ease-in-out infinite;
+}
+
+.light-ray-1 {
+  left: 11%;
+  width: 80px;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 212, 255, 0.22) 0%, transparent 100%);
+  transform: skewX(-11deg);
+  animation-duration: 7s;
+  animation-delay: 0s;
+}
+
+.light-ray-2 {
+  left: 28%;
+  width: 50px;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 212, 255, 0.14) 0%, transparent 100%);
+  transform: skewX(6deg);
+  animation-duration: 9s;
+  animation-delay: -2.5s;
+}
+
+.light-ray-3 {
+  left: 53%;
+  width: 68px;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 212, 255, 0.18) 0%, transparent 100%);
+  transform: skewX(-5deg);
+  animation-duration: 6.5s;
+  animation-delay: -5s;
+}
+
+.light-ray-4 {
+  left: 76%;
+  width: 44px;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 212, 255, 0.11) 0%, transparent 100%);
+  transform: skewX(8deg);
+  animation-duration: 10s;
+  animation-delay: -1s;
+}
+
+@keyframes rayFlicker {
+  0%,  100% { opacity: 0; }
+  30%,  70%  { opacity: 1; }
+}
+
+/* ======================================================================
+   4. FISH — horizontal swim
+   ====================================================================== */
+.fish-wrapper {
+  position: absolute;
+  left: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@keyframes swimLeft {
+  from { transform: translateX(110vw); }
+  to   { transform: translateX(-20vw); }
+}
+
+@keyframes swimRight {
+  from { transform: translateX(-20vw); }
+  to   { transform: translateX(110vw); }
+}
+
+/* Body bob + tilt — applied to .fish-svg inside the wrapper */
+@keyframes fishSwim {
+  0%   { transform: translateY(0px)   rotate(0deg);    }
+  25%  { transform: translateY(-9px)  rotate(2.5deg);  }
+  50%  { transform: translateY(0px)   rotate(0deg);    }
+  75%  { transform: translateY(9px)   rotate(-2.5deg); }
+  100% { transform: translateY(0px)   rotate(0deg);    }
+}
+
+.fish-svg {
+  display: block;
+  animation: fishSwim 2.5s ease-in-out infinite;
+}
+
+/* Individual fish instances */
+.fish-1 { top: 11%; animation: swimLeft  24s linear infinite;                }
+.fish-2 { top: 40%; animation: swimRight 18s linear infinite; animation-delay: -6s;  }
+.fish-3 { top: 63%; animation: swimLeft  30s linear infinite; animation-delay: -15s; }
+.fish-4 { top: 24%; animation: swimRight 14s linear infinite; animation-delay: -3s;  }
+.fish-5 { top: 78%; animation: swimLeft  21s linear infinite; animation-delay: -20s; }
+
+/* Vary the bob speed per fish */
+.fish-1 .fish-svg { animation-duration: 2.2s; }
+.fish-2 .fish-svg { animation-duration: 1.8s; }
+.fish-3 .fish-svg { animation-duration: 2.8s; }
+.fish-4 .fish-svg { animation-duration: 1.6s; }
+.fish-5 .fish-svg { animation-duration: 3.0s; }
+
+/* ======================================================================
+   5. JELLYFISH
+   ====================================================================== */
+
+/* Outer float wrapper — handles horizontal position + vertical rise */
+.jelly-float {
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@keyframes jellyfishFloat {
+  0%   { transform: translateY(105vh); opacity: 0; }
+  6%   { opacity: 1;  }
+  94%  { opacity: 1;  }
+  100% { transform: translateY(-25vh);  opacity: 0; }
+}
+
+/* Inner drift wrapper — side-to-side wobble */
+@keyframes jellyfishDrift {
+  0%,  100% { transform: translateX(0px);   }
+  30%        { transform: translateX(28px);  }
+  70%        { transform: translateX(-22px); }
+}
+
+/* Bell pulse on innermost div */
+@keyframes bellPulse {
+  0%,  100% { transform: scaleY(1)    scaleX(1);   }
+  50%        { transform: scaleY(0.82) scaleX(1.1); }
+}
+
+.jelly-1 { left:  8%; animation: jellyfishFloat 22s ease-in-out infinite; animation-delay:   0s;  }
+.jelly-2 { left: 72%; animation: jellyfishFloat 27s ease-in-out infinite; animation-delay: -9s;   }
+.jelly-3 { left: 48%; animation: jellyfishFloat 19s ease-in-out infinite; animation-delay: -16s;  }
+
+.jelly-drift {
+  animation: jellyfishDrift 5s ease-in-out infinite;
+}
+.jelly-1 .jelly-drift { animation-duration: 4s;   animation-delay: 0s;  }
+.jelly-2 .jelly-drift { animation-duration: 6s;   animation-delay: -2s; }
+.jelly-3 .jelly-drift { animation-duration: 4.8s; animation-delay: -1s; }
+
+.jelly-bell {
+  display: block;
+  animation: bellPulse 2.2s ease-in-out infinite;
+  transform-origin: center top;
+}
+
+/* ======================================================================
+   6. BUBBLES
+   ====================================================================== */
+.bubble {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(255, 255, 255, 0.48) 0%,
+    rgba(0, 200, 255, 0.08)  60%,
+    transparent              100%
+  );
+  border: 1px solid rgba(0, 212, 255, 0.28);
+  pointer-events: none;
+  z-index: 3;
+  animation: bubbleRise linear infinite;
+}
+
+@keyframes bubbleRise {
+  0%   { transform: translateY(0)      translateX(0px); opacity: 0;    }
+  8%   {                                                 opacity: 0.85; }
+  85%  {                                                 opacity: 0.4;  }
+  100% { transform: translateY(-105vh) translateX(8px);  opacity: 0;    }
+}
+
+/* ======================================================================
+   7. SEAWEED
+   ====================================================================== */
+.seaweed-group {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.seaweed-group-left  { left: 0; }
+.seaweed-group-right { right: 0; transform: scaleX(-1); }
+
+.seaweed-stem {
+  display: block;
+  transform-origin: center bottom;
+  animation-name: seaweedSway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes seaweedSway {
+  0%,  100% { transform: rotate(-10deg); }
+  50%        { transform: rotate(10deg);  }
+}
+
+/* ======================================================================
+   8. SPARKLES
+   ====================================================================== */
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(0, 212, 255, 0.9);
+  box-shadow: 0 0 6px rgba(0, 212, 255, 0.8), 0 0 14px rgba(0, 212, 255, 0.4);
+  pointer-events: none;
+  z-index: 3;
+  animation: sparklePop ease-in-out infinite;
+}
+
+@keyframes sparklePop {
+  0%,  100% { transform: scale(0); opacity: 0; }
+  50%        { transform: scale(1); opacity: 1; }
+}
+
+/* ======================================================================
+   9. OCEAN FLOOR GRADIENT
+   ====================================================================== */
+.ocean-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110px;
+  background: linear-gradient(to top, rgba(0, 18, 44, 0.92) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ======================================================================
+   10. FORM CARD
+   ====================================================================== */
+.auth-card-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 464px;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  position: relative;
+  background: rgba(1, 10, 26, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 26px;
+  padding: 1.75rem 2rem 1.5rem;
+  box-shadow:
+    0 0 0 1px rgba(0, 212, 255, 0.04) inset,
+    0 1px 0   rgba(0, 212, 255, 0.22) inset,
+    0 32px 80px rgba(0, 0, 0, 0.75);
+  animation: cardAppear 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Top-edge shimmer line */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.45), transparent);
+  border-radius: 50%;
+}
+
+@keyframes cardAppear {
+  from { opacity: 0; transform: translateY(38px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ======================================================================
+   11. LOGO
+   ====================================================================== */
+.auth-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  margin-bottom: 1.2rem;
+}
+
+.auth-logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 6px 22px rgba(6, 182, 212, 0.5), 0 0 0 1px rgba(6, 182, 212, 0.25);
+  animation: logoPulse 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes logoPulse {
+  0%,  100% { box-shadow: 0 6px 22px rgba(6,182,212,0.5),  0 0 0 1px rgba(6,182,212,0.25); }
+  50%        { box-shadow: 0 10px 34px rgba(6,182,212,0.72), 0 0 0 3px rgba(6,182,212,0.15); }
+}
+
+.auth-logo-text h1 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ddf4ff;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  margin: 0;
+}
+
+.auth-logo-text p {
+  font-size: 0.6rem;
+  color: rgba(0, 212, 255, 0.5);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin: 3px 0 0;
+}
+
+/* ======================================================================
+   12. HEADINGS
+   ====================================================================== */
+.auth-heading {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #ddf4ff;
+  line-height: 1.2;
+  margin: 0 0 0.35rem;
+}
+
+.auth-subheading {
+  font-size: 0.85rem;
+  color: rgba(140, 210, 240, 0.5);
+  font-weight: 300;
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+/* ======================================================================
+   13. STEP PROGRESS  (Signup)
+   ====================================================================== */
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.step-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.4s ease;
+}
+
+.step-circle.active {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.65);
+}
+
+.step-circle.inactive {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.step-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: color 0.4s;
+}
+
+.step-label.active   { color: #06b6d4; }
+.step-label.inactive { color: rgba(255, 255, 255, 0.25); }
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  border-radius: 100px;
+  transition: background 0.5s ease;
+}
+
+.step-line.active   { background: linear-gradient(90deg, #06b6d4, #3b82f6); }
+.step-line.inactive { background: rgba(255, 255, 255, 0.08); }
+
+/* ======================================================================
+   14. ALERT BOXES
+   ====================================================================== */
+.auth-error-box {
+  background: rgba(239, 68, 68, 0.11);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.2rem;
+  color: #fca5a5;
+  font-size: 0.84rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-success-box {
+  background: rgba(16, 185, 129, 0.11);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.2rem;
+  color: #6ee7b7;
+  font-size: 0.84rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ======================================================================
+   15. FORM FIELDS
+   ====================================================================== */
+.form-group {
+  margin-bottom: 0.85rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.71rem;
+  font-weight: 600;
+  color: rgba(0, 212, 255, 0.55);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.input-wrap {
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.input-wrap:focus-within {
+  transform: translateY(-1px);
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: rgba(0, 212, 255, 0.32);
+  transition: color 0.3s;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.input-wrap:focus-within .input-icon {
+  color: #06b6d4;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.65rem;
+  background: rgba(0, 212, 255, 0.042);
+  border: 1.5px solid rgba(0, 212, 255, 0.13);
+  border-radius: 12px;
+  color: #c8eeff;
+  font-size: 0.92rem;
+  font-family: 'Outfit', inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+}
+
+.auth-input::placeholder {
+  color: rgba(150, 220, 255, 0.2);
+}
+
+.auth-input:focus {
+  border-color: rgba(0, 212, 255, 0.55);
+  background: rgba(0, 212, 255, 0.065);
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.09), 0 0 18px rgba(0, 212, 255, 0.04);
+}
+
+.auth-input.has-right-btn {
+  padding-right: 3rem;
+}
+
+.auth-input.otp-input {
+  text-align: center;
+  letter-spacing: 0.55em;
+  font-size: 1.35rem;
+  font-weight: 700;
+  padding-left: 1rem;
+  color: #00d4ff;
+}
+
+.toggle-pw-btn {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(0, 212, 255, 0.3);
+  font-size: 0.9rem;
+  padding: 0;
+  transition: color 0.2s;
+  z-index: 1;
+}
+
+.toggle-pw-btn:hover {
+  color: rgba(0, 212, 255, 0.85);
+}
+
+/* ======================================================================
+   16. FORGOT PASSWORD LINK
+   ====================================================================== */
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 0.78rem;
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 0.4rem;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #7dd3fc;
+}
+
+/* ======================================================================
+   17. SUBMIT BUTTON
+   ====================================================================== */
+.auth-submit-btn {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 55%, #6366f1 100%);
+  background-size: 200% 200%;
+  border: none;
+  border-radius: 13px;
+  color: white;
+  font-family: 'Outfit', inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 8px 28px rgba(6, 182, 212, 0.4), 0 0 0 1px rgba(6, 182, 212, 0.15) inset;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: gradientFlow 4s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 42px rgba(6, 182, 212, 0.58), 0 0 0 1px rgba(6, 182, 212, 0.2) inset;
+}
+
+.auth-submit-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(6, 182, 212, 0.4);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Green variant for Signup */
+.auth-submit-btn.signup-btn {
+  background: linear-gradient(135deg, #10b981 0%, #06b6d4 55%, #3b82f6 100%);
+  box-shadow: 0 8px 28px rgba(16, 185, 129, 0.4), 0 0 0 1px rgba(16, 185, 129, 0.15) inset;
+}
+
+.auth-submit-btn.signup-btn:hover:not(:disabled) {
+  box-shadow: 0 14px 42px rgba(16, 185, 129, 0.55), 0 0 0 1px rgba(16, 185, 129, 0.2) inset;
+}
+
+/* Loading spinner */
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ======================================================================
+   18. DIVIDER
+   ====================================================================== */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.auth-divider-text {
+  font-size: 0.76rem;
+  color: rgba(140, 210, 240, 0.3);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ======================================================================
+   19. FOOTER LINKS
+   ====================================================================== */
+.auth-link-row {
+  text-align: center;
+  color: rgba(140, 210, 240, 0.4);
+  font-size: 0.82rem;
+  margin-top: 1rem;
+}
+
+.auth-link-row a {
+  color: #22d3ee;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.auth-link-row a:hover {
+  color: #67e8f9;
+  text-shadow: 0 0 14px rgba(0, 212, 255, 0.55);
+}
+
+.auth-back-link {
+  display: block;
+  text-align: center;
+  margin-top: 0.6rem;
+  color: rgba(140, 210, 240, 0.25);
+  font-size: 0.78rem;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.auth-back-link:hover {
+  color: rgba(140, 210, 240, 0.6);
+}
+
+/* ======================================================================
+   20. PASSWORD STRENGTH
+   ====================================================================== */
+.pw-strength {
+  margin-top: 0.5rem;
+}
+
+.pw-strength-bars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.pw-strength-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 100px;
+  transition: background 0.35s ease;
+}
+
+.pw-strength-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ======================================================================
+   21. OTP HELPERS
+   ====================================================================== */
+.otp-helper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+}
+
+.otp-edit-btn {
+  background: none;
+  border: none;
+  color: rgba(140, 210, 240, 0.4);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.78rem;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.otp-edit-btn:hover {
+  color: rgba(140, 210, 240, 0.75);
+}
+
+.otp-resend-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+/* ======================================================================
+   22. RESPONSIVE
+   ====================================================================== */
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 2rem 1.5rem 1.75rem;
+    border-radius: 20px;
+  }
+
+  .auth-heading {
+    font-size: 1.65rem;
+  }
+
+  .auth-card-wrapper {
+    padding: 0.75rem;
+  }
+
+  .auth-logo-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+  }
+
+  .auth-logo-text h1 {
+    font-size: 1rem;
+  }
+
+  /* Reduce scene complexity on mobile */
+  .fish-3,
+  .fish-5,
+  .jelly-3,
+  .ocean-orb-3 {
+    display: none;
+  }
+}

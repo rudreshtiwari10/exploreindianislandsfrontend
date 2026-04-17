@@ -10,6 +10,7 @@ import PlanTrip from './pages/PlanTrip';
 import SearchResults from './pages/SearchResults';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import VerifyOtp from './pages/VerifyOtp';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
 import PublicProfile from './pages/PublicProfile';
@@ -30,34 +31,44 @@ const RequireAuth = ({ children }) => {
   return children;
 };
 
+const AppContent = () => {
+  const location = useLocation();
+  const hideLayout = ['/login', '/signup', '/forgot-password', '/verify-otp'].includes(location.pathname);
+
+  return (
+    <div className="min-h-screen">
+      {!hideLayout && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/islands" element={<Islands />} />
+        <Route path="/island/:id" element={<IslandDetail />} />
+        <Route path="/group/:groupName" element={<IslandGroup />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/plan-trip" element={<RequireAuth><PlanTrip /></RequireAuth>} />
+        <Route path="/search" element={<SearchResults />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/user/:id" element={<PublicProfile />} />
+        <Route path="/post/:id" element={<PostDetail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/new-post" element={<NewPost />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/island/:id/:featureType" element={<IslandFeature />} />
+      </Routes>
+      {!hideLayout && <Footer />}
+      {!hideLayout && <FloatingActions />}
+    </div>
+  );
+};
+
 function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="min-h-screen">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/islands" element={<Islands />} />
-          <Route path="/island/:id" element={<IslandDetail />} />
-          <Route path="/group/:groupName" element={<IslandGroup />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/plan-trip" element={<RequireAuth><PlanTrip /></RequireAuth>} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/user/:id" element={<PublicProfile />} />
-          <Route path="/post/:id" element={<PostDetail />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/new-post" element={<NewPost />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/island/:id/:featureType" element={<IslandFeature />} />
-        </Routes>
-        <Footer />
-        <FloatingActions />
-      </div>
+      <AppContent />
     </Router>
   );
 }
