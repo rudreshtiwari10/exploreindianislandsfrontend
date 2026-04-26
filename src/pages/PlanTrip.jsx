@@ -219,7 +219,7 @@ const PlanTrip = () => {
       });
       setRouteData(res.data);
       setCurrentStep(2);
-    } catch (err) { setError(err.response?.data?.error || 'Failed to fetch routes.'); }
+    } catch (err) { setError(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch routes.'); }
     finally { setLoading(false); }
   };
 
@@ -242,7 +242,7 @@ const PlanTrip = () => {
       if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
         setError('Request timed out. The AI service is busy — please try again in a moment.');
       } else {
-        setError(err.response?.data?.error || 'Failed to fetch accommodations.');
+        setError(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch accommodations.');
       }
     }
     finally { setLoading(false); }
@@ -267,7 +267,13 @@ const PlanTrip = () => {
       });
       setActivitiesData(res.data);
       setCurrentStep(4);
-    } catch (err) { setError(err.response?.data?.error || 'Failed to fetch activities.'); }
+    } catch (err) {
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setError('Request timed out. The AI service is busy — please try again in a moment.');
+      } else {
+        setError(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch activities.');
+      }
+    }
     finally { setLoading(false); }
   };
 
@@ -296,7 +302,13 @@ const PlanTrip = () => {
       });
       setFinalPlan(res.data);
       setCurrentStep(5);
-    } catch (err) { setError(err.response?.data?.error || 'Failed to generate itinerary.'); }
+    } catch (err) {
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setError('Request timed out. The AI service is busy — please try again in a moment.');
+      } else {
+        setError(err.response?.data?.error || err.response?.data?.message || 'Failed to generate itinerary.');
+      }
+    }
     finally { setLoading(false); }
   };
 
